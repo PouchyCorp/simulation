@@ -149,7 +149,8 @@ class CELL():
             self.neighborCount += 1
 
         if self.state == 3 and (self.master.state != 2 or self.neighborCount == 0):
-            self.futureState = 0
+            if random.randint(0,100) == 0:
+                self.futureState = 0
             pass
 
         if self.state == 3 and hasattr(self.master, 'appartenance') and len(
@@ -333,19 +334,19 @@ while run:
             if cell.state == 1:
                 rect = p.Rect(cell.x * cell_width, cell.y * cell_width, cell_width, cell_width)
                 p.draw.rect(WIN, cell.colo[0], rect)
-            if cell.state == 2:
+            elif cell.state == 2:
                 rect = p.Rect(cell.x * cell_width, cell.y * cell_width, cell_width, cell_width)
                 p.draw.rect(WIN, '#5B653B', rect)
-            if cell.state == 3:
+            elif cell.state == 3:
                 rect = p.Rect(cell.x * cell_width, cell.y * cell_width, cell_width, cell_width)
                 p.draw.rect(WIN, cell.colo[0], rect)
-            if cell.state == 4:
+            elif cell.state == 4:
                 rect = p.Rect(cell.x * cell_width, cell.y * cell_width, cell_width, cell_width)
                 p.draw.rect(WIN, 'grey', rect)
-            if cell.state == 5:
+            elif cell.state == 5:
                 rect = p.Rect(cell.x * cell_width, cell.y * cell_width, cell_width, cell_width)
                 p.draw.rect(WIN, 'red', rect)
-            if cell.state == 6:
+            elif cell.state == 6:
                 rect = p.Rect(cell.x * cell_width, cell.y * cell_width, cell_width, cell_width)
                 p.draw.rect(WIN, 'black', rect)
             # stat = font.render(str(cell.master),False,(0,0,0))
