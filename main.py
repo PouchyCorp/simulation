@@ -29,25 +29,22 @@ class CELL():
         self.hp = 0
         pass
 
-    def checkCell(self, dir, state):
-        if dir == "UP" and self.y > 0 and ca[self.x][self.y - 1].state == state:
+    def checkCell(self, dir, state, bypass = False):
+        if dir == "UP" and self.y > 0 and (ca[self.x][self.y - 1].state == state or bypass):
             return True
-        elif dir == "DOWN" and self.y < height_width - 1 and ca[self.x][self.y + 1].state == state:
+        elif dir == "DOWN" and self.y < height_width - 1 and (ca[self.x][self.y + 1].state == state or bypass):
             return True
-        elif dir == "RIGHT" and self.x < height_width - 1 and ca[self.x + 1][self.y].state == state:
+        elif dir == "RIGHT" and self.x < height_width - 1 and (ca[self.x + 1][self.y].state == state or bypass):
             return True
-        elif dir == "LEFT" and self.x > 0 and ca[self.x - 1][self.y].state == state:
+        elif dir == "LEFT" and self.x > 0 and (ca[self.x - 1][self.y].state == state or bypass):
             return True
-        elif dir == "UP LEFT" and self.y > 0 and self.x > 0 and ca[self.x - 1][self.y - 1].state == state:
+        elif dir == "UP LEFT" and self.y > 0 and self.x > 0 and (ca[self.x - 1][self.y - 1].state == state or bypass):
             return True
-        elif dir == "UP RIGHT" and self.x < height_width - 1 and self.y > 0 and ca[self.x + 1][
-            self.y - 1].state == state:
+        elif dir == "UP RIGHT" and self.x < height_width - 1 and self.y > 0 and (ca[self.x + 1][self.y - 1].state == state or bypass):
             return True
-        elif dir == "DOWN LEFT" and self.y < height_width - 1 and self.x > 0 and ca[self.x - 1][
-            self.y + 1].state == state:
+        elif dir == "DOWN LEFT" and self.y < height_width - 1 and self.x > 0 and (ca[self.x - 1][self.y + 1].state == state or bypass):
             return True
-        elif dir == "DOWN RIGHT" and self.y < height_width - 1 and self.x < height_width - 1 and ca[self.x + 1][
-            self.y + 1].state == state:
+        elif dir == "DOWN RIGHT" and self.y < height_width - 1 and self.x < height_width - 1 and (ca[self.x + 1][self.y + 1].state == state or bypass):
             return True
         return False
 
@@ -81,27 +78,24 @@ class CELL():
 
         return self.neighborCount
 
-    def moveCell(self, dir):
+    def moveCell(self, dir, bypass = False):
         dest = 0
-        if self.checkCell(dir, 0):
+        if self.checkCell(dir, 0) or bypass:
             if dir == "UP" and hasattr(ca[self.x][self.y - 1], 'futureState') is False:
                 dest = ca[self.x][self.y - 1]
-            elif dir == "DOWN" and self.checkCell(dir, 0) and hasattr(ca[self.x][self.y + 1], 'futureState') is False:
+            elif dir == "DOWN" and hasattr(ca[self.x][self.y + 1], 'futureState') is False:
                 dest = ca[self.x][self.y + 1]
-            elif dir == "RIGHT" and self.checkCell(dir, 0) and hasattr(ca[self.x + 1][self.y], 'futureState') is False:
+            elif dir == "RIGHT" and hasattr(ca[self.x + 1][self.y], 'futureState') is False:
                 dest = ca[self.x + 1][self.y]
-            elif dir == "LEFT" and self.checkCell(dir, 0) and hasattr(ca[self.x - 1][self.y], 'futureState') is False:
+            elif dir == "LEFT" and hasattr(ca[self.x - 1][self.y], 'futureState') is False:
                 dest = ca[self.x - 1][self.y]
-            elif dir == "UP LEFT" and self.checkCell(dir, 0) and hasattr(ca[self.x - 1][self.y - 1], 'futureState') is False:
+            elif dir == "UP LEFT" and hasattr(ca[self.x - 1][self.y - 1], 'futureState') is False:
                 dest = ca[self.x - 1][self.y - 1]
-            elif dir == "UP RIGHT" and self.checkCell(dir, 0) and hasattr(ca[self.x + 1][self.y - 1],
-                                                                          'futureState') is False:
+            elif dir == "UP RIGHT" and hasattr(ca[self.x + 1][self.y - 1],'futureState') is False:
                 dest = ca[self.x + 1][self.y - 1]
-            elif dir == "DOWN LEFT" and self.checkCell(dir, 0) and hasattr(ca[self.x - 1][self.y + 1],
-                                                                           'futureState') is False:
+            elif dir == "DOWN LEFT" and hasattr(ca[self.x - 1][self.y + 1],'futureState') is False:
                 dest = ca[self.x - 1][self.y + 1]
-            elif dir == "DOWN RIGHT" and self.checkCell(dir, 0) and hasattr(ca[self.x + 1][self.y + 1],
-                                                                            'futureState') is False:
+            elif dir == "DOWN RIGHT" and hasattr(ca[self.x + 1][self.y + 1],'futureState') is False:
                 dest = ca[self.x + 1][self.y + 1]
             if dest != 0:
                 dest.futureState = self.state
@@ -133,8 +127,24 @@ class CELL():
             elif downRight:
                 self.moveCell('DOWN RIGHT')
 
+    def ruleWater(self):
+        right = self.checkCell('RIGHT', 0)
+        left = self.checkCell('LEFT', 0)
+        if self.checkCell('DOWN', 0) == False:
+            if right and left:
+                if random.randint(1, 2) == 1:
+                    self.moveCell('LEFT')
+                else:
+                    self.moveCell('RIGHT')
+            elif left:
+                self.moveCell('LEFT')
+            elif right:
+                self.moveCell('RIGHT')
+        if self.checkCell('UP', 1):
+            self.futureState = 0
+
+
     def rulePlant(self):
-        rand = random.randint(10, 30)
         if self.state == 2 and self.y > 0 and ca[self.x][self.y - 1].state == 0 and self.checkCell('DOWN', 1) == True:
             ca[self.x][self.y - 1].futureState = 3
             ca[self.x][self.y - 1].master = self
@@ -152,26 +162,26 @@ class CELL():
             if random.randint(0,100) == 0:
                 self.futureState = 0
             pass
+        
+        if random.randint(0,100) in [0,10]:
+            if self.state == 3 and hasattr(self.master, 'appartenance') and len(self.master.appartenance) <= self.master.size:
+                randDir = random.randint(0, 4)
+                if self.checkCell('UP', 0) and self.checkCell('UP LEFT', 0) and self.checkCell('UP RIGHT', 0):
+                    ca[self.x][self.y - 1].futureState = 3
+                    ca[self.x][self.y - 1].master = self.master
+                    self.master.appartenance.append(self)
+                elif randDir == 2 and self.checkCell('RIGHT', 0) and self.checkCell('UP RIGHT', 0) and self.checkCell('DOWN RIGHT', 0):
+                    ca[self.x + 1][self.y].futureState = 3
+                    ca[self.x + 1][self.y].master = self.master
+                    self.master.appartenance.append(self)
+                elif randDir == 3 and (self.checkCell('LEFT', 0)) and self.checkCell('UP LEFT', 0) and self.checkCell('DOWN LEFT', 0):
+                    ca[self.x - 1][self.y].futureState = 3
+                    ca[self.x - 1][self.y].master = self.master
+                    self.master.appartenance.append(self)
 
-        if self.state == 3 and hasattr(self.master, 'appartenance') and len(
-                self.master.appartenance) <= self.master.size:
-            rand = random.randint(0, 4)
-            if (self.checkCell('UP', 0)) and self.checkCell('UP LEFT', 0) and self.checkCell('UP RIGHT', 0):
-                ca[self.x][self.y - 1].futureState = 3
-                ca[self.x][self.y - 1].master = self.master
-                self.master.appartenance.append(self)
-            elif (rand == 2) and self.checkCell('RIGHT', 0) and self.checkCell('UP RIGHT', 0) and self.checkCell(
-                    'DOWN RIGHT', 0):
-                ca[self.x + 1][self.y].futureState = 3
-                ca[self.x + 1][self.y].master = self.master
-                self.master.appartenance.append(self)
-            elif rand == 3 and (self.checkCell('LEFT', 0)) and self.checkCell('UP LEFT', 0) and self.checkCell(
-                    'DOWN LEFT', 0):
-                ca[self.x - 1][self.y].futureState = 3
-                ca[self.x - 1][self.y].master = self.master
-                self.master.appartenance.append(self)
 
-        if self.state == 3 and self.master.size <= len(self.master.appartenance) < self.master.size + 4:
+        rand = random.randint(10, 20)
+        if self.state == 3 and self.master.size <= len(self.master.appartenance) < self.master.size + 2:
             if self.checkCell('UP', 0) and self.checkNeighbor(3) < 2:
                 self.master.appartenance.append(ca[self.x][self.y - 1])
                 ca[self.x][self.y - 1].futureState = 5
@@ -232,7 +242,7 @@ class CELL():
             self.colo = random.choice(list(col.items()))
 
     def gravity(self):
-        if self.checkCell('DOWN', 0):
+        if self.checkCell('DOWN', 0, True):
             self.moveCell('DOWN')
 
     def update(self):
@@ -269,19 +279,25 @@ while run:
                     for cell in line:
                         if cell.x == roundedPosX and cell.y == roundedPosY:
                             cell.state = 2
-                            cell.size = random.randint(5, 50)
-            if event.key == p.K_KP4:
+                            cell.size = random.randint(10, 20)
+            elif event.key == p.K_KP4:
                 for line in ca:
                     for cell in line:
                         if cell.x == roundedPosX and cell.y == roundedPosY:
                             cell.state = 4
                             cell.hp = bugHp
                             print(cell.hp)
-            if event.key == p.K_KP6:
+            elif event.key == p.K_KP6:
                 for line in ca:
                     for cell in line:
                         if cell.x == roundedPosX and cell.y == roundedPosY:
                             cell.state = 6
+            elif event.key == p.K_KP7:
+                for line in ca:
+                    for cell in line:
+                        if cell.x == roundedPosX and cell.y == roundedPosY:
+                            cell.state = 7
+
 
     if click[0]:
         for line in ca:
@@ -304,7 +320,7 @@ while run:
 
     for line in ca:
         for cell in line:
-            if cell.state in [1, 2, 6]:
+            if cell.state in [1, 2, 6, 7]:
                 cell.gravity()
             if cell.state == 1 or cell.state == 2:
                 cell.checkNeighbor(1)
@@ -318,6 +334,9 @@ while run:
                 cell.ruleBug()
             if cell.state == 6:
                 cell.ruleBomb()
+            if cell.state == 7:
+                cell.ruleWater()
+            
 
     for line in ca:
         for cell in line:
@@ -349,8 +368,11 @@ while run:
             elif cell.state == 6:
                 rect = p.Rect(cell.x * cell_width, cell.y * cell_width, cell_width, cell_width)
                 p.draw.rect(WIN, 'black', rect)
-            # stat = font.render(str(cell.master),False,(0,0,0))
-            # WIN.blit(stat,(cell.x*cell_width,cell.y*cell_width))
+            elif cell.state == 7:
+                rect = p.Rect(cell.x * cell_width, cell.y * cell_width, cell_width, cell_width)
+                p.draw.rect(WIN, 'blue', rect)
+            stat = font.render(str(cell.size),False,(0,0,0))
+            WIN.blit(stat,(cell.x*cell_width,cell.y*cell_width))
 
     x = 0
     pos = font.render(str(roundedPosX) + ' ' + str(roundedPosY), False, (100, 100, 100))
