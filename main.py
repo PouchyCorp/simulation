@@ -103,7 +103,7 @@ class CELL():
                 dest.hp = self.hp
                 self.hp = 0
                 self.size = 0
-                self.futureState = 0
+                self.futureState = dest.state
 
     def cellCount(self, searched_state):
         count = 0
@@ -244,7 +244,7 @@ class CELL():
             self.colo = random.choice(list(col.items()))
 
     def gravity(self):
-        if self.checkCell('DOWN', [0], True):
+        if self.checkCell('DOWN', [0, 7], True):
             self.moveCell('DOWN')
 
     def update(self):
