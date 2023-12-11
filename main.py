@@ -13,7 +13,7 @@ height_width = 50
 cell_width = HEIGHT / height_width
 last = p.time.get_ticks()
 bugHp = 1000
-
+fruitHp = 2
 
 class CELL():
     def __init__(self, x, y):
@@ -78,9 +78,9 @@ class CELL():
 
         return self.neighborCount
 
-    def moveCell(self, dir, bypass = False):
+    def moveCell(self, dir, destState = [0], bypass = False):
         dest = 0
-        if self.checkCell(dir, [0]) or bypass:
+        if self.checkCell(dir, destState) or bypass:
             if dir == "UP" and hasattr(ca[self.x][self.y - 1], 'futureState') is False:
                 dest = ca[self.x][self.y - 1]
             elif dir == "DOWN" and hasattr(ca[self.x][self.y + 1], 'futureState') is False:
@@ -130,6 +130,8 @@ class CELL():
     def ruleWater(self):
         right = self.checkCell('RIGHT', [0])
         left = self.checkCell('LEFT', [0])
+        if self.checkCell('DOWN', [0]):
+            self.moveCell('DOWN')
         if self.checkCell('DOWN', [0]) == False:
             if right and left:
                 if random.randint(1, 2) == 1:
@@ -140,8 +142,6 @@ class CELL():
                 self.moveCell('LEFT')
             elif right:
                 self.moveCell('RIGHT')
-        if self.checkCell('UP', [1]):
-            self.futureState = 0
 
 
     def rulePlant(self):
@@ -182,23 +182,20 @@ class CELL():
 
         rand = random.randint(10, 20)
         if self.state == 3 and self.master.size <= len(self.master.appartenance) < self.master.size + 2:
-            print(1)
             if self.checkCell('UP', [0]) and self.checkNeighbor(3) < 3:
-                print(2)
                 self.master.appartenance.append(ca[self.x][self.y - 1])
                 ca[self.x][self.y - 1].futureState = 5
                 ca[self.x][self.y - 1].master = self.master
-                ca[self.x][self.y - 1].hp = 5
+                ca[self.x][self.y - 1].hp = fruitHp
 
         if self.state == 5 and self.hp < 0:
             self.futureState = 2
             self.size = rand
-            ct = -1
+            plant_count = -1
             for cell in self.master.appartenance:
                 if cell.state == 5:
-                    ct += 1
-            print(ct)
-            if ct == 0:
+                    plant_count += 1
+            if plant_count == 0:
                 self.master.seedCountdown = 100
 
     def ruleBug(self):
@@ -245,7 +242,7 @@ class CELL():
 
     def gravity(self):
         if self.checkCell('DOWN', [0, 7], True):
-            self.moveCell('DOWN')
+            self.moveCell('DOWN', [0, 7])
 
     def update(self):
         if hasattr(self, 'futureState'):
@@ -322,7 +319,7 @@ while run:
     for line in ca:
         for cell in line:
             if cell.state != 0:
-                if cell.state in [1, 2, 6, 7]:
+                if cell.state in [1, 2, 6]:
                     cell.gravity()
                 if cell.state == 1 or cell.state == 2:
                     cell.checkNeighbor(1)
@@ -373,8 +370,8 @@ while run:
             elif cell.state == 7:
                 rect = p.Rect(cell.x * cell_width, cell.y * cell_width, cell_width, cell_width)
                 p.draw.rect(WIN, 'blue', rect)
-            stat = font.render(str(cell.size),False,(0,0,0))
-            WIN.blit(stat,(cell.x*cell_width,cell.y*cell_width))
+            #stat = font.render(str(cell.size),False,(0,0,0))
+            #WIN.blit(stat,(cell.x*cell_width,cell.y*cell_width))
 
     x = 0
     pos = font.render(str(roundedPosX) + ' ' + str(roundedPosY), False, (100, 100, 100))
