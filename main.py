@@ -13,7 +13,9 @@ height_width = 50
 cell_width = HEIGHT / height_width
 last = p.time.get_ticks()
 bugHp = 1000
-fruitHp = 2
+fruitHp = 1
+maxPlantSize = 40
+minPlantSize = 10
 
 class CELL():
     def __init__(self, x, y):
@@ -180,9 +182,13 @@ class CELL():
                     self.master.appartenance.append(self)
 
 
-        rand = random.randint(10, 20)
         if self.state == 3 and self.master.size <= len(self.master.appartenance) < self.master.size + 2:
-            if self.checkCell('UP', [0]) and self.checkNeighbor(3) < 3:
+            noOtherYFruit = True
+            for i in range(50):
+                if ca[self.x][i].state == 5 and i != self.y:
+                    print('owo')
+                    noOtherYFruit = False
+            if self.checkCell('UP', [0]) and self.checkNeighbor(3) < 3 and noOtherYFruit:
                 self.master.appartenance.append(ca[self.x][self.y - 1])
                 ca[self.x][self.y - 1].futureState = 5
                 ca[self.x][self.y - 1].master = self.master
@@ -190,7 +196,7 @@ class CELL():
 
         if self.state == 5 and self.hp < 0:
             self.futureState = 2
-            self.size = rand
+            self.size = random.randint(minPlantSize, maxPlantSize)
             plant_count = -1
             for cell in self.master.appartenance:
                 if cell.state == 5:
@@ -278,7 +284,7 @@ while run:
                     for cell in line:
                         if cell.x == roundedPosX and cell.y == roundedPosY:
                             cell.state = 2
-                            cell.size = random.randint(10, 20)
+                            cell.size = random.randint(minPlantSize, maxPlantSize)
             elif event.key == p.K_KP4:
                 for line in ca:
                     for cell in line:
