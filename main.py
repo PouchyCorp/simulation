@@ -5,11 +5,11 @@ import cProfile as profile
 p.font.init()
 font = p.font.SysFont('Comic Sans MS', 9)
 
-HEIGHT = 500
+HEIGHT = 800
 WIDTH = HEIGHT
 WIN = p.display.set_mode((WIDTH, HEIGHT))
 p.display.set_caption("Pouchy's Lore")
-height_width = 50
+height_width = 80
 cell_width = HEIGHT / height_width
 last = p.time.get_ticks()
 bugHp = 1000
@@ -161,7 +161,7 @@ class CELL():
             self.neighborCount += 1
 
         if self.state == 3 and (self.master.state != 2 or self.neighborCount == 0):
-            if random.randint(0,100) == 0:
+            if random.randint(0,70) == 0:
                 self.futureState = 0
             pass
         
@@ -279,24 +279,24 @@ while run:
             run = False
             break
         if event.type == p.KEYDOWN:
-            if event.key == p.K_KP2:
+            if event.key in [p.K_KP2, p.K_2] :
                 for line in ca:
                     for cell in line:
                         if cell.x == roundedPosX and cell.y == roundedPosY:
                             cell.state = 2
                             cell.size = random.randint(minPlantSize, maxPlantSize)
-            elif event.key == p.K_KP4:
+            elif event.key in [p.K_KP4, p.K_4]:
                 for line in ca:
                     for cell in line:
                         if cell.x == roundedPosX and cell.y == roundedPosY:
                             cell.state = 4
                             cell.hp = bugHp
-            elif event.key == p.K_KP6:
+            elif event.key in [p.K_KP6, p.K_6]:
                 for line in ca:
                     for cell in line:
                         if cell.x == roundedPosX and cell.y == roundedPosY:
                             cell.state = 6
-            elif event.key == p.K_KP7:
+            elif event.key in [p.K_KP7, p.K_7]:
                 for line in ca:
                     for cell in line:
                         if cell.x == roundedPosX and cell.y == roundedPosY:
@@ -318,9 +318,9 @@ while run:
         for line in ca:
             for cell in line:
                 if cell.x == roundedPosX and cell.y == roundedPosY:
-                    ca[cell.x + 1][cell.y].futureState = 0
-                    ca[cell.x + 1][cell.y + 1].futureState = 0
-                    ca[cell.x][cell.y + 1].futureState = 0
+                    ca[cell.x + 1][cell.y].futureState = 7
+                    ca[cell.x + 1][cell.y + 1].futureState = 7
+                    ca[cell.x][cell.y + 1].futureState = 7
 
     for line in ca:
         for cell in line:
