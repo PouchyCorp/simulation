@@ -1,6 +1,5 @@
 import pygame as p
 import random
-import cProfile as profile
 
 p.font.init()
 font = p.font.SysFont('Comic Sans MS', 9)
